@@ -273,6 +273,8 @@ int main(int argc, char **argv)
 void WorkStart() /* routine that each created process starts at;
                     it simply calls the timestep routine */
 {
+    zsim_worker_roi_begin();
+
     long ProcID;
     double LocalXTT;
 /*
@@ -292,4 +294,6 @@ void WorkStart() /* routine that each created process starts at;
     if (ProcID == 0) {
 	    XTT = LocalXTT;
     }
+
+    zsim_worker_roi_end();
 }

@@ -393,6 +393,8 @@ int main(int argc, char *argv[])
 
 void slave_sort()
 {
+  zsim_worker_roi_begin();
+
    long i;
    long MyNum;
    long this_key;
@@ -648,6 +650,7 @@ void slave_sort()
      global->final = to;
    }
 
+  zsim_worker_roi_end();
 }
 
 /*

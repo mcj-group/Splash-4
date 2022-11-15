@@ -39,9 +39,10 @@ m4_define(CAS, `({_NOTE_START_CMPXCHG(); _Bool ___b = atomic_compare_exchange_we
 m4_define(_CAS, `({_Bool ___b = atomic_compare_exchange_weak(($1), &($2), $3); ___b;})') m4_dnl Only intended for internal use
 m4_define(FETCH_ADD_DOUBLE, `({
   _NOTE_START_CMPXCHG(); 
-  double ___oldValue = LOAD(*($1));
+  double ___oldValue;
   double ___newValue;
   do {
+    ___oldValue = *($1);
     ___newValue = ___oldValue + $2;
   } while (!_CAS($1, ___oldValue, ___newValue));
   _NOTE_END_CMPXCHG(); 
@@ -62,9 +63,9 @@ _NOTE_START_BARRIER();
 __local_sense__ = !__local_sense__;
 if (atomic_fetch_sub(&(__count__), 1) == 1) {
 	__count__ = $2;
-	STORE(__sense__, __local_sense__);
+	__sense__ = __local_sense__;
 } else {
-	do {} while (LOAD(__sense__) != __local_sense__);
+	do {} while (__sense__ != __local_sense__);
 }
 _NOTE_END_BARRIER();
 }'
@@ -107,6 +108,17 @@ m4_define(BAREXTERN,
 	extern __thread int __local_sense__;
 '
 , `'))
+
+m4_dnl m4_define(LOCKDEC, `Lock $1;')
+m4_dnl m4_define(LOCKINIT, `{sw_lock_init_p(&($1),NULL);}')
+m4_dnl m4_define(LOCK, `{_NOTE_START_LOCK(); sw_lock_aquire(&($1)); _NOTE_END_LOCK();}')
+m4_dnl m4_define(UNLOCK, `{_NOTE_START_UNLOCK(); sw_lock_release(&($1)); _NOTE_END_UNLOCK();}')
+
+m4_dnl m4_define(ALOCKDEC, `Lock ($1)[$2];')
+m4_dnl m4_define(ALOCKINIT, `{ int i; for(i = 0; i < ($2); i++) sw_lock_init_p(&(($1)[i]), NULL); }')
+m4_dnl m4_define(ALOCK, `{_NOTE_START_LOCK(); sw_lock_aquire(&(($1)[($2)])); _NOTE_END_LOCK();}')
+m4_dnl m4_define(AGETL, `(($1)[$2])')
+m4_dnl m4_define(AULOCK, `{_NOTE_START_UNLOCK(); sw_lock_release(&(($1)[($2)])); _NOTE_END_UNLOCK();}')
 
 m4_define(LOCKDEC, `pthread_mutex_t $1;')
 m4_define(LOCKINIT, `{pthread_mutex_init(&($1),NULL);}')
@@ -193,6 +205,9 @@ m4_define(INCLUDES,`
 #include <pthread.h>
 #include <sched.h>
 #include <unistd.h>
+
+#include "/mnt/ceph/users/igi/splash4/swarm-runtime/include/swarm/worker_hooks.h"
+//#include "/mnt/ceph/users/igi/splash4/swarm-runtime/include/swarm/impl/simple_lock.h"
 
 #define PAGE_SIZE 4096
 #define __MAX_THREADS__ 256

@@ -234,6 +234,8 @@ void Frame()
 
 void Render_Loop()
 {
+  zsim_worker_roi_begin();
+
   long step,i;
   PIXEL *local_image_address;
   MPIXEL *local_mask_image_address;
@@ -342,6 +344,7 @@ WriteGrayscaleTIFF(filename, image_len[X],image_len[Y],image_len[X], image_addre
 #ifdef DIM
   }
 #endif
+  zsim_worker_roi_end();
 }
 
 #if 0

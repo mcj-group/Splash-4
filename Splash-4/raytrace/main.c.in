@@ -228,6 +228,8 @@ VOID	PrintStatistics()
 
 VOID	StartRayTrace()
 	{
+	zsim_worker_roi_begin();
+
 	INT	pid;			/* Our internal process id number.   */
 	UINT	begin;
 	UINT	end;
@@ -269,6 +271,8 @@ VOID	StartRayTrace()
           gm->partime[pid] = (end - begin) & 0x7FFFFFFF;
           if (pid == 0) gm->par_start_time = begin;
         }
+	
+	zsim_worker_roi_end();
 	}
 
 

@@ -320,6 +320,8 @@ int main(int argc, char *argv[])
 
 void SlaveStart()
 {
+  zsim_worker_roi_begin();
+
   long MyNum;
 /*
   LOCK(Global->idlock)
@@ -333,6 +335,8 @@ void SlaveStart()
    processors to avoid migration */
 
   OneSolve(n, block_size, MyNum, dostats);
+
+  zsim_worker_roi_end();
 }
 
 

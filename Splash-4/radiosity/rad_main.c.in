@@ -806,6 +806,8 @@ static void expose_callback()
 
 void radiosity()
 {
+    zsim_worker_roi_begin();
+
     long process_id;
     long rad_start, refine_done, vertex_start, vertex_done;
 /*
@@ -867,6 +869,7 @@ void radiosity()
         timing[process_id]->wait_time = vertex_start - refine_done;
     }
 
+    zsim_worker_roi_end();
 }
 
 

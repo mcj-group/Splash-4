@@ -28,6 +28,8 @@ EXTERN_ENV
 
 void slave()
 {
+  zsim_worker_roi_begin();
+
    long i;
    long j;
    long nstep;
@@ -819,5 +821,7 @@ eof(double) +
     CLOCK(t1);
     gp[procid].total_time = t1-gp[procid].total_time;
   }
+
+  zsim_worker_roi_end();
 }
 

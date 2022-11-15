@@ -391,6 +391,8 @@ void tab_init()
  */
 void SlaveStart()
 {
+   zsim_worker_roi_begin();
+
    long ProcessId;
 
    /* Get unique ProcessId */
@@ -451,6 +453,7 @@ void SlaveStart()
 //      printtree(Global->G_root);
 //      printf("Going to next step!!!\n");
    }
+   zsim_worker_roi_end();
 }
 
 

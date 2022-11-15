@@ -318,6 +318,8 @@ int main(int argc, char *argv[])
 
 void Go()
 {
+  zsim_worker_roi_begin();
+
   long MyNum;
   struct LocalCopies *lc;
 /*
@@ -375,6 +377,7 @@ void Go()
   } 
   BARRIER(Global->start, P);
 
+  zsim_worker_roi_end();
 }
 
 

@@ -27,6 +27,8 @@
 
 void slave()
 {
+  zsim_worker_roi_begin();
+
    long i;
    long j;
    long nstep;
@@ -620,4 +622,6 @@ BARRIER(bars->sl_prini,nprocs)
     CLOCK(t1);
     gp[procid].total_time = t1-gp[procid].total_time;
   }
+  
+  zsim_worker_roi_end();
 }

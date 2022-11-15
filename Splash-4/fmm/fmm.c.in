@@ -158,6 +158,8 @@ main (int argc, char *argv[])
 void
 ParallelExecute ()
 {
+   zsim_worker_roi_begin();
+
    long my_id;
    long num_boxes;
    unsigned long start, finish = 0;
@@ -254,6 +256,7 @@ ParallelExecute ()
    Local[my_id].init_done_times = local_init_done;
    BARRIER(G_Memory->synch, Number_Of_Processors)
 
+   zsim_worker_roi_end();
 }
 
 
