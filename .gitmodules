@@ -1,0 +1,3 @@
+[submodule "swarm-runtime"]
+	path = swarm-runtime
+	url = git@github.com:mcj-group/swarm-runtime.git
