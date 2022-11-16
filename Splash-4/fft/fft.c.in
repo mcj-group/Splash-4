@@ -424,7 +424,7 @@ int main(int argc, char *argv[])
 
 void SlaveStart()
 {
-  zsim_worker_roi_begin();
+  SWARM_WORKER_ROI_BEGIN();
   
   long i;
   long MyNum;
@@ -487,7 +487,7 @@ void SlaveStart()
     Global->finishtime = finish;
     Global->initdonetime = initdone;
   }
-  zsim_worker_roi_end();
+  SWARM_WORKER_ROI_END();
 }
 
 

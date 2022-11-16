@@ -8,6 +8,9 @@ m4_dnl Empty ROI markers
 m4_define(SPLASH3_ROI_BEGIN, `')
 m4_define(SPLASH3_ROI_END, `')
 
+m4_define(SWARM_WORKER_ROI_BEGIN, `zsim_worker_roi_begin')
+m4_define(SWARM_WORKER_ROI_END, `zsim_worker_roi_end')
+
 m4_dnl Region markers
 m4_define(_NOTE_START_LOCK, `')
 m4_define(_NOTE_END_LOCK, `')

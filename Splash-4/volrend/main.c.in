@@ -234,7 +234,7 @@ void Frame()
 
 void Render_Loop()
 {
-  zsim_worker_roi_begin();
+  SWARM_WORKER_ROI_BEGIN();
 
   long step,i;
   PIXEL *local_image_address;
@@ -344,7 +344,7 @@ WriteGrayscaleTIFF(filename, image_len[X],image_len[Y],image_len[X], image_addre
 #ifdef DIM
   }
 #endif
-  zsim_worker_roi_end();
+  SWARM_WORKER_ROI_END();
 }
 
 #if 0
