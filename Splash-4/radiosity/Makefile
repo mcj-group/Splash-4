@@ -6,6 +6,7 @@ HS = model.h parallel.h patch.h radiosity.h task.h structs.h
 
 include ../../Makefile.config
 
+M4FLAGS += -D SIMPLE_TTAS
 
 CFLAGS := $(CFLAGS) -I./glibdumb -I./glibps
 

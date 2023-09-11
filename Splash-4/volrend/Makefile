@@ -3,6 +3,8 @@ OBJS = adaptive.o file.o main.o map.o normal.o octree.o opacity.o option.o raytr
 
 include ../../Makefile.config
 
+M4FLAGS += -D SIMPLE_TTAS
+
 CFLAGS := $(CFLAGS) -I./libtiff
 LDFLAGS := -static -L./libtiff $(LDFLAGS) -ltiff
 

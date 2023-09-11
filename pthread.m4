@@ -8,8 +8,8 @@ m4_dnl Empty ROI markers
 m4_define(SPLASH3_ROI_BEGIN, `')
 m4_define(SPLASH3_ROI_END, `')
 
-m4_define(SWARM_WORKER_ROI_BEGIN, `zsim_worker_roi_begin')
-m4_define(SWARM_WORKER_ROI_END, `zsim_worker_roi_end')
+m4_define(SWARM_WORKER_ROI_BEGIN, `zsim_worker_roi_begin()')
+m4_define(SWARM_WORKER_ROI_END, `zsim_worker_roi_end()')
 
 m4_dnl Region markers
 m4_define(_NOTE_START_LOCK, `')
@@ -112,27 +112,55 @@ m4_define(BAREXTERN,
 '
 , `'))
 
-m4_dnl m4_define(LOCKDEC, `Lock $1;')
-m4_dnl m4_define(LOCKINIT, `{sw_lock_init_p(&($1),NULL);}')
-m4_dnl m4_define(LOCK, `{_NOTE_START_LOCK(); sw_lock_aquire(&($1)); _NOTE_END_LOCK();}')
-m4_dnl m4_define(UNLOCK, `{_NOTE_START_UNLOCK(); sw_lock_release(&($1)); _NOTE_END_UNLOCK();}')
+m4_define(LOCKDEC, m4_ifdef(`SIMPLE_TTAS',
+	`Lock $1;',
+	`pthread_mutex_t $1;'))
+m4_define(LOCKINIT, m4_ifdef(`SIMPLE_TTAS',
+	`{sw_lock_init_p(&($1),NULL); printf("Using TTAS for lock $1\n");}',
+	`{pthread_mutexattr_t attr;
+		pthread_mutexattr_init(&attr);
+		pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_ADAPTIVE_NP);
+		($1).__data.__spins = 10000;
+		pthread_mutex_init(&($1), &attr);
+		($1).__data.__spins = 10000;
+		printf("Using pmutex (adaptive) for lock $1\n"); }'))
+m4_dnl `{pthread_mutex_init(&($1),NULL); printf("Using pmutex (normal) for lock $1\n");}'))
+m4_define(LOCK, m4_ifdef(`SIMPLE_TTAS',
+	`{_NOTE_START_LOCK(); sw_lock_aquire(&($1)); _NOTE_END_LOCK();}',
+	`{_NOTE_START_LOCK(); pthread_mutex_lock(&($1)); _NOTE_END_LOCK();}'))
+m4_define(UNLOCK, m4_ifdef(`SIMPLE_TTAS',
+	`{_NOTE_START_UNLOCK(); sw_lock_release(&($1)); _NOTE_END_UNLOCK();}',
+	`{_NOTE_START_UNLOCK(); pthread_mutex_unlock(&($1)); _NOTE_END_UNLOCK();}'))
 
-m4_dnl m4_define(ALOCKDEC, `Lock ($1)[$2];')
-m4_dnl m4_define(ALOCKINIT, `{ int i; for(i = 0; i < ($2); i++) sw_lock_init_p(&(($1)[i]), NULL); }')
-m4_dnl m4_define(ALOCK, `{_NOTE_START_LOCK(); sw_lock_aquire(&(($1)[($2)])); _NOTE_END_LOCK();}')
-m4_dnl m4_define(AGETL, `(($1)[$2])')
-m4_dnl m4_define(AULOCK, `{_NOTE_START_UNLOCK(); sw_lock_release(&(($1)[($2)])); _NOTE_END_UNLOCK();}')
-
-m4_define(LOCKDEC, `pthread_mutex_t $1;')
-m4_define(LOCKINIT, `{pthread_mutex_init(&($1),NULL);}')
-m4_define(LOCK, `{_NOTE_START_LOCK(); pthread_mutex_lock(&($1)); _NOTE_END_LOCK();}')
-m4_define(UNLOCK, `{_NOTE_START_UNLOCK(); pthread_mutex_unlock(&($1)); _NOTE_END_UNLOCK();}')
-
-m4_define(ALOCKDEC, `pthread_mutex_t ($1)[$2];')
-m4_define(ALOCKINIT, `{ int i; for(i = 0; i < ($2); i++) pthread_mutex_init(&(($1)[i]), NULL); }')
-m4_define(ALOCK, `{_NOTE_START_LOCK(); pthread_mutex_lock(&(($1)[($2)])); _NOTE_END_LOCK();}')
-m4_define(AGETL, `(($1)[$2])')
-m4_define(AULOCK, `{_NOTE_START_UNLOCK(); pthread_mutex_unlock(&(($1)[($2)])); _NOTE_END_UNLOCK();}')
+m4_define(ALOCKDEC, m4_ifdef(`SIMPLE_TTAS',
+	`Lock ($1)[$2];',
+	`pthread_mutex_t ($1)[$2];'))
+m4_define(ALOCKINIT, m4_ifdef(`SIMPLE_TTAS',
+	`{ printf("Using TTAS for lock $1[]\n");
+		int i; 
+		for(i = 0; i < ($2); i++)
+			sw_lock_init_p(&(($1)[i]), NULL); }',
+	`{ int i; for(i = 0; i < ($2); i++) {
+			pthread_mutexattr_t attr;
+			pthread_mutexattr_init(&attr);
+			pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_ADAPTIVE_NP);
+			(($1)[i]).__data.__spins = 10000;
+			pthread_mutex_init(&(($1)[i]), &attr);
+			(($1)[i]).__data.__spins = 10000;
+		}
+		printf("Using pmutex (adaptive) for lock $1[]\n"); }'))
+	`{ int i; for(i = 0; i < ($2); i++)
+			pthread_mutex_init(&(($1)[i]), NULL);
+		printf("Using pmutex (normal) for lock $1[]\n"); }'))
+m4_define(ALOCK, m4_ifdef(`SIMPLE_TTAS',
+	`{_NOTE_START_LOCK(); sw_lock_aquire(&(($1)[($2)])); _NOTE_END_LOCK();}',
+	`{_NOTE_START_LOCK(); pthread_mutex_lock(&(($1)[($2)])); _NOTE_END_LOCK();}'))
+m4_define(AGETL, m4_ifdef(`SIMPLE_TTAS',
+	`(($1)[$2])',
+	`(($1)[$2])'))
+m4_define(AULOCK, m4_ifdef(`SIMPLE_TTAS',
+	`{_NOTE_START_UNLOCK(); sw_lock_release(&(($1)[($2)])); _NOTE_END_UNLOCK();}',
+	`{_NOTE_START_UNLOCK(); pthread_mutex_unlock(&(($1)[($2)])); _NOTE_END_UNLOCK();}'))
 
 m4_define(PAUSEDEC, `sem_t $1;')
 m4_define(PAUSEINIT, `{sem_init(&($1),0,0);}')
@@ -209,8 +237,9 @@ m4_define(INCLUDES,`
 #include <sched.h>
 #include <unistd.h>
 
+#include <stdio.h>
 #include "/mnt/ceph/users/igi/splash4/swarm-runtime/include/swarm/worker_hooks.h"
-//#include "/mnt/ceph/users/igi/splash4/swarm-runtime/include/swarm/impl/simple_lock.h"
+#include "/mnt/ceph/users/igi/splash4/swarm-runtime/include/swarm/impl/simple_lock.h"
 
 #define PAGE_SIZE 4096
 #define __MAX_THREADS__ 256

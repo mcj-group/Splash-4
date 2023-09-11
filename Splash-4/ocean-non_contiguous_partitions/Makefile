@@ -3,6 +3,9 @@ OBJS = jacobcalc.o laplacalc.o main.o multi.o slave1.o slave2.o
 
 include ../../Makefile.config
 
+M4FLAGS += -D SIMPLE_TTAS
+
+
 decs.h: decs.h.in
 jacobcalc.c: decs.h
 main.c: decs.h

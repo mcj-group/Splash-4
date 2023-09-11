@@ -144,6 +144,10 @@ int main(int argc, char *argv[])
                   printerr("Maximum processors (MAX_PROCESSORS) exceeded\n"); 
 		  exit(-1);
 		}
+                if ((number_of_processors & (number_of_processors - 1)) != 0) {
+                    printerr("P must be a power of 2\n"); 
+                    exit(-1);
+                }
                 break;
       case 'r': radix = atoi(optarg);
                 if (radix < 1) {

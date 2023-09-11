@@ -162,7 +162,15 @@ Splash-4/water-spatial/split.h
 Splash-4/water-spatial/water.h
 Splash-4/water-spatial/wwpot.h
 
+# more generated files
+Splash-4/raytrace/inputs/car.rl
+Splash-4/volrend/inputs/head_10*
 
 # Make sure not to ignore .in files
 ! *.in
 
+# ignore micro benchmark/test runs and executables
+ubench/runs
+test/pmutex_test
+test/ttas_test
+ubench/instrPerInvx

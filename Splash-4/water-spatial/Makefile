@@ -3,6 +3,7 @@ OBJS = bndry.o cnstnt.o cshift.o initia.o interf.o intraf.o kineti.o mdmain.o po
 
 include ../../Makefile.config
 
+M4FLAGS += -D SIMPLE_TTAS
 
 bndry.o: bndry.c.in split.h mdvar.h parameters.h mddata.h global.h
 cnstnt.o: cnstnt.c.in water.h wwpot.h cnst.h frcnst.h fileio.h parameters.h global.h

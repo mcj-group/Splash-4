@@ -6,6 +6,7 @@ OBJS = bbox.o cr.o env.o fbuf.o geo.o huprn.o husetup.o hutv.o isect.o \
 
 include ../../Makefile.config
 
+M4FLAGS += -D SIMPLE_TTAS
 
 bbox.c: bbox.c.in rt.h
 cr.c:	cr.c.in rt.h
